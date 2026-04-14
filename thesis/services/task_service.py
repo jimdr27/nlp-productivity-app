@@ -16,7 +16,12 @@ def get_tasks():
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT id, title FROM tasks WHERE status = 'pending'")
+    cursor.execute("""
+    SELECT id, title 
+    FROM tasks 
+    WHERE status = 'pending'
+    ORDER BY id DESC
+    """)
     tasks = cursor.fetchall()
 
     conn.close()

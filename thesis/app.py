@@ -19,9 +19,9 @@ def chat():
     clean_message = message.lower().strip()
     
     
-    if clean_message.startswith("add"):  
+    if clean_message.startswith("add "):  
         
-        task_title = message.strip()[4:].strip() 
+        task_title = clean_message.strip()[4:].strip() 
         
         if task_title:
             add_task(task_title) 
