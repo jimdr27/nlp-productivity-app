@@ -54,9 +54,11 @@ async function sendMessage() {
 }
 
 
-document.getElementById("userInput").addEventListener("keypress", function(event) {
-    if (event.key === "Enter") {
-        event.preventDefault(); 
-        sendMessage();
-    }
+document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("userInput").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            sendMessage();
+        }
+    });
 });
