@@ -11,3 +11,13 @@ def add_task(title):
 
     conn.commit()
     conn.close()
+
+def get_tasks():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT id, title FROM tasks WHERE status = 'pending'")
+    tasks = cursor.fetchall()
+
+    conn.close()
+    return tasks
