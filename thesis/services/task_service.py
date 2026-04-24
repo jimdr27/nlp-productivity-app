@@ -26,3 +26,4 @@ def get_tasks():
 
     conn.close()
     return tasks
+
