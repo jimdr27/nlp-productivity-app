@@ -9,7 +9,7 @@ async function sendMessage() {
 
  
     chatbox.innerHTML += `
-        <div style="text-align: right; margin: 10px; color: #0056b3;">
+        <div class="user-message">
             <b>You:</b> ${message}
         </div>
     `;
@@ -35,7 +35,7 @@ async function sendMessage() {
 
         
         chatbox.innerHTML += `
-            <div style="text-align: left; margin: 10px; color: #28a745;">
+            <div class="bot-message">
                 <b>Assistant:</b> ${data.response}
             </div>
         `;

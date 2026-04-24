@@ -37,7 +37,7 @@ def chat():
         if not tasks:
             return jsonify({"response": "You have no pending tasks! Great job."})
 
-        task_list = "<br>".join([f"• {task['title']}" for task in tasks])
+        task_list = "<br>".join([f"• [ID: {task['id']}] {task['title']}" for task in tasks])
         return jsonify({"response": f"Here are your tasks:<br>{task_list}"})
     
     # ✅ COMPLETE TASK
@@ -62,3 +62,4 @@ def chat():
 if __name__ == "__main__":
     init_db()
     app.run(debug=True)  
+
