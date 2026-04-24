@@ -16,4 +16,3 @@ SQLite (Database)
 JavaScript (Fetch API) (Frontend communication)
 HTML/CSS (User Interface)
 spaCy (planned for NLP processing)
-
