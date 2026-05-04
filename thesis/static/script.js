@@ -15,7 +15,8 @@ async function sendMessage() {
     `;
     
 
-    inputField.value = ""; 
+    inputField.value = "";
+    inputField.focus();
 
 
     chatbox.scrollTop = chatbox.scrollHeight;
@@ -55,7 +56,14 @@ async function sendMessage() {
 
 
 document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("userInput").addEventListener("keypress", function(event) {
+
+    const input = document.getElementById("userInput");
+
+    
+    input.focus();
+
+    
+    input.addEventListener("keypress", function(event) {
         if (event.key === "Enter") {
             event.preventDefault();
             sendMessage();
