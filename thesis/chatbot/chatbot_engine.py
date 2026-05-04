@@ -1,70 +1,93 @@
 import spacy
+import dateparser
 
 print("Loading AI Model (this takes a second)...")
 nlp = spacy.load("en_core_web_sm")
 print("Model loaded successfully!")
 
 def parse_message(user_input):
-    """
-    Takes raw user text, processes it with spaCy, and returns a dictionary 
-    containing the user's intent and any extracted data.
-    """
     doc = nlp(user_input.lower())
 
     extracted_data = {
         "intent": "unknown",
         "task_title": None,
         "task_id": None,
-        "due_date": None  
+        "due_date": None
     }
 
-    
     lemmas = [token.lemma_ for token in doc]
 
-    
-    if "add" in lemmas or "remind" in lemmas or "create" in lemmas:
+    # ➕ ADD TASK
+    if set(lemmas) & {"add", "remind", "create"}:
         extracted_data["intent"] = "add_task"
 
-        filler_words = ["add", "remind", "me", "to", "create", "a", "task", "please", "could", "you"]
+        date_words = set()
 
-        
+        # 1. Look for the date words FIRST using spaCy
+        for ent in doc.ents:
+            if ent.label_ in ("DATE", "TIME"):
+                
+                # 2. Pass ONLY those specific words to dateparser!
+                parsed_date = dateparser.parse(
+                    ent.text,
+                    settings={"PREFER_DATES_FROM": "future"}
+                )
+                
+                # Save the first valid date we find
+                if parsed_date and not extracted_data["due_date"]:
+                    extracted_data["due_date"] = parsed_date.strftime("%Y-%m-%d %H:%M")
+
+                # Add the words to our removal set
+                for word in ent.text.lower().split():
+                    date_words.add(word)
+
+        # 3. Clean up the rest of the title
+        date_words.update([
+            "today", "tomorrow", "tonight", "next",
+            "this", "in", "am", "pm"
+        ])
+
+        filler_words = {
+            "add", "remind", "me", "to", "create", "a", "task",
+            "please", "could", "you", "for", "at", "by", "on", "my", "list"
+        }
+
         task_words = [
-            token.text for token in doc 
-            if token.text.lower() not in filler_words and not token.is_punct
+            token.text for token in doc
+            if token.text.lower() not in filler_words
+            and token.text.lower() not in date_words
+            and not token.is_punct
         ]
 
         if task_words:
-            extracted_data["task_title"] = " ".join(task_words).capitalize()
+            extracted_data["task_title"] = " ".join(task_words).strip().capitalize()
 
     
-    elif "show" in lemmas or "list" in lemmas:
+
+    # 📅 TODAY
+    elif "today" in lemmas and set(lemmas) & {"show", "list", "what"}:
+        extracted_data["intent"] = "tasks_today"
+
+
+    # 📋 SHOW TASKS
+    elif set(lemmas) & {"show", "list"}:
         extracted_data["intent"] = "show_tasks"
 
-    
-    elif "complete" in lemmas or "finish" in lemmas or "done" in lemmas:
+    # ✅ COMPLETE TASK
+    elif set(lemmas) & {"complete", "finish", "done"}:
         extracted_data["intent"] = "complete_task"
 
         for token in doc:
             if token.like_num:
-                extracted_data["task_id"] = int(token.text) 
+                extracted_data["task_id"] = int(token.text)
+                break
+
+
+    elif set(lemmas) & {"delete", "remove", "cancel"}:
+        extracted_data["intent"] = "delete_task"
+        for token in doc:
+            if token.like_num:
+                extracted_data["task_id"] = int(token.text)
                 break
 
     return extracted_data
-
-
-
-if __name__ == "__main__":
-    test_sentences = [
-        "Please add buy milk to my list!",
-        "Could you remind me to call mom?",
-        "Show me my tasks.",
-        "I just finished task 2"
-    ]
-
-    print("\n--- Testing the NLP Engine ---")
-    for sentence in test_sentences:
-        print(f"\nUser: '{sentence}'")
-        result = parse_message(sentence)
-        print(f"Bot understood: {result}")
-
-        
