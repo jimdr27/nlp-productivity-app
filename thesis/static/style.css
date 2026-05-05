@@ -184,3 +184,75 @@ button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+/* Message action buttons */
+.message-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+}
+
+.action-btn {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-family: var(--font-mono);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.complete-btn {
+    background: rgba(0, 229, 160, 0.15);
+    color: var(--accent);
+    border-color: rgba(0, 229, 160, 0.3);
+}
+
+.complete-btn:hover {
+    background: rgba(0, 229, 160, 0.25);
+}
+
+.delete-btn {
+    background: rgba(255, 99, 71, 0.15);
+    color: #ff6347;
+    border-color: rgba(255, 99, 71, 0.3);
+}
+
+.delete-btn:hover {
+    background: rgba(255, 99, 71, 0.25);
+}
+
+
+.clear-btn {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.clear-btn:hover {
+    color: var(--text);
+    border-color: var(--text-muted);
+}
+
+.message-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.timestamp {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    opacity: 0.7;
+}
