@@ -29,25 +29,29 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 10px;
 }
 
 #app {
     width: 100%;
     max-width: 680px;
+    height: 100vh;
     display: flex;
     flex-direction: column;
     gap: 16px;
 }
 
 /* Header */
+.header-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 #header h1 {
     font-family: var(--font-mono);
     font-size: 1.4rem;
     color: var(--accent);
-    display: flex;
-    align-items: center;
-    gap: 10px;
 }
 
 #status-dot {
@@ -71,11 +75,11 @@ body {
 
 /* Chatbox */
 #chatbox {
+    flex: 1;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 20px;
-    height: 420px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -130,6 +134,18 @@ body {
     border: 1px solid rgba(0, 229, 160, 0.15);
 }
 
+/* Typing animation */
+.typing-indicator .bubble::after {
+    content: " .";
+    animation: dots 1.2s infinite;
+}
+
+@keyframes dots {
+    0% { content: " ."; }
+    33% { content: " .."; }
+    66% { content: " ..."; }
+}
+
 /* Input */
 #input-area {
     display: flex;
@@ -157,6 +173,11 @@ button {
     border-radius: 12px;
     padding: 12px 22px;
     cursor: pointer;
+    transition: 0.2s;
+}
+
+button:hover {
+    opacity: 0.9;
 }
 
 button:disabled {

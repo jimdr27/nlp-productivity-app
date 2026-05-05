@@ -11,40 +11,54 @@ function escapeHTML(str) {
     });
 }
 
+function sanitizeResponse(str) {
+    return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/&lt;br&gt;/g, "<br>");
+}
+
+function addMessage(type, text) {
+    const chatbox = document.getElementById("chatbox");
+
+    const html = `
+        <div class="${type}-message">
+            <span class="label">${type === "user" ? "You" : "Assistant"}</span>
+            <div class="bubble">${text}</div>
+        </div>
+    `;
+
+    chatbox.insertAdjacentHTML("beforeend", html);
+
+    chatbox.scrollTo({
+        top: chatbox.scrollHeight,
+        behavior: "smooth"
+    });
+}
+
 async function sendMessage() {
     const inputField = document.getElementById("userInput");
-    const chatbox = document.getElementById("chatbox");
     const button = document.getElementById("sendBtn");
 
     const message = inputField.value.trim();
     if (!message) return;
 
-    // Disable button
     button.disabled = true;
+    inputField.disabled = true;
 
-    // Add user message
-    chatbox.insertAdjacentHTML("beforeend", `
-        <div class="user-message">
-            <span class="label">You</span>
-            <div class="bubble">${escapeHTML(message)}</div>
-        </div>
-    `);
+    addMessage("user", escapeHTML(message));
 
     inputField.value = "";
-    inputField.focus();
-    chatbox.scrollTop = chatbox.scrollHeight;
 
-    // Typing indicator
     const typingId = "typing-" + Date.now();
 
-    chatbox.insertAdjacentHTML("beforeend", `
+    document.getElementById("chatbox").insertAdjacentHTML("beforeend", `
         <div class="bot-message typing-indicator" id="${typingId}">
             <span class="label">Assistant</span>
-            <div class="bubble">Typing...</div>
+            <div class="bubble">Typing</div>
         </div>
     `);
-
-    chatbox.scrollTop = chatbox.scrollHeight;
 
     try {
         const response = await fetch("/chat", {
@@ -55,34 +69,36 @@ async function sendMessage() {
 
         const data = await response.json();
 
-        // Simulate thinking delay
         await new Promise(r => setTimeout(r, 300));
 
         document.getElementById(typingId)?.remove();
 
-        chatbox.insertAdjacentHTML("beforeend", `
-            <div class="bot-message">
-                <span class="label">Assistant</span>
-                <div class="bubble">${data.response}</div>
-            </div>
-        `);
+        addMessage("bot", sanitizeResponse(data.response));
 
     } catch (error) {
         document.getElementById(typingId)?.remove();
 
-        chatbox.insertAdjacentHTML("beforeend", `
-            <div class="error-message">System: Could not connect to the server.</div>
-        `);
+        addMessage("bot", "⚠️ Could not connect to server.");
     }
 
     button.disabled = false;
-    chatbox.scrollTop = chatbox.scrollHeight;
+    inputField.disabled = false;
+    inputField.focus();
 }
 
-// Events
 document.addEventListener("DOMContentLoaded", () => {
     const input = document.getElementById("userInput");
     const button = document.getElementById("sendBtn");
+
+    // Initial bot message
+    addMessage("bot", `
+        Hello! I'm your task assistant.<br><br>
+        Try saying:<br>
+        • add buy groceries<br>
+        • show tasks<br>
+        • complete task 1<br>
+        • delete task 2
+    `);
 
     input.focus();
 
