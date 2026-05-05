@@ -1,16 +1,34 @@
+function escapeHTML(str) {
+    return str.replace(/[&<>"']/g, function (match) {
+        const escape = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return escape[match];
+    });
+}
+
 async function sendMessage() {
     const inputField = document.getElementById("userInput");
     const chatbox = document.getElementById("chatbox");
+    const button = document.getElementById("sendBtn");
+
     const message = inputField.value.trim();
+    if (!message) return;
 
-    if (message === "") return;
+    // Disable button
+    button.disabled = true;
 
-    chatbox.innerHTML += `
+    // Add user message
+    chatbox.insertAdjacentHTML("beforeend", `
         <div class="user-message">
             <span class="label">You</span>
-            <div class="bubble">${message}</div>
+            <div class="bubble">${escapeHTML(message)}</div>
         </div>
-    `;
+    `);
 
     inputField.value = "";
     inputField.focus();
@@ -18,12 +36,14 @@ async function sendMessage() {
 
     // Typing indicator
     const typingId = "typing-" + Date.now();
-    chatbox.innerHTML += `
+
+    chatbox.insertAdjacentHTML("beforeend", `
         <div class="bot-message typing-indicator" id="${typingId}">
             <span class="label">Assistant</span>
-            <div class="bubble"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+            <div class="bubble">Typing...</div>
         </div>
-    `;
+    `);
+
     chatbox.scrollTop = chatbox.scrollHeight;
 
     try {
@@ -35,32 +55,43 @@ async function sendMessage() {
 
         const data = await response.json();
 
+        // Simulate thinking delay
+        await new Promise(r => setTimeout(r, 300));
+
         document.getElementById(typingId)?.remove();
 
-        chatbox.innerHTML += `
+        chatbox.insertAdjacentHTML("beforeend", `
             <div class="bot-message">
                 <span class="label">Assistant</span>
                 <div class="bubble">${data.response}</div>
             </div>
-        `;
-
-        chatbox.scrollTop = chatbox.scrollHeight;
+        `);
 
     } catch (error) {
         document.getElementById(typingId)?.remove();
-        chatbox.innerHTML += `
+
+        chatbox.insertAdjacentHTML("beforeend", `
             <div class="error-message">System: Could not connect to the server.</div>
-        `;
+        `);
     }
+
+    button.disabled = false;
+    chatbox.scrollTop = chatbox.scrollHeight;
 }
 
-document.addEventListener("DOMContentLoaded", function () {
+// Events
+document.addEventListener("DOMContentLoaded", () => {
     const input = document.getElementById("userInput");
+    const button = document.getElementById("sendBtn");
+
     input.focus();
-    input.addEventListener("keypress", function (event) {
-        if (event.key === "Enter") {
-            event.preventDefault();
+
+    input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
             sendMessage();
         }
     });
+
+    button.addEventListener("click", sendMessage);
 });
