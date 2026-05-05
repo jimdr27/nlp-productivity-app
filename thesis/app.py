@@ -5,7 +5,8 @@ from routes.task_routes import task_bp
 app = Flask(__name__)
 app.config.from_pyfile("config.py")
 
-app.register_blueprint(task_bp)
+
+app.register_blueprint(task_bp, url_prefix='/api')
 
 @app.route("/")
 def home():

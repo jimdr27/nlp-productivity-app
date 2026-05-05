@@ -100,8 +100,18 @@ async function sendMessage(forcedMessage = null) {
         </div>
     `);
 
+    // In sendMessage(), replace the task check:
+    if (data.tasks && data.tasks.length > 0) {
+        // Show first task's actions OR create task list with buttons
+        data.tasks.forEach(task => {
+            addBotMessageWithActions(`Task ${task.id}: ${task.title}`, task);
+        });
+    } else {
+        addMessage("bot", sanitizeResponse(data.response));
+    }
+
     try {
-        const response = await fetch("/chat", {
+        const response = await fetch("/api/chat", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ message: message })
@@ -168,4 +178,16 @@ document.addEventListener("DOMContentLoaded", () => {
         chatbox.innerHTML = '';
         addMessage("bot", "Chat cleared! How can I help you?");
     });
+
+    // In script.js DOMContentLoaded, test connection
+    async function testConnection() {
+        try {
+            await fetch("/api/test-nlp", {method: "POST", body: JSON.stringify({message: "test"})});
+            document.getElementById("status-dot").style.background = "var(--accent)";
+        } catch(e) {
+            document.getElementById("status-dot").style.background = "#ff4757";
+        }
+    }
+    testConnection();
+
 });

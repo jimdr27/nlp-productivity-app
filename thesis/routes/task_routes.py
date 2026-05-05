@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from datetime import datetime
 from services.task_service import add_task, get_tasks, complete_task, delete_task
 from chatbot.chatbot_engine import parse_message
+import dateparser
 
 task_bp = Blueprint("tasks", __name__)
 
@@ -37,6 +38,10 @@ def chat():
         task_title = parsed_data["task_title"]
         due_date = parsed_data["due_date"]
 
+        if due_date:
+            parsed = dateparser.parse(due_date)
+            date_msg = f" Due: {parsed.strftime('%d %b at %H:%M')}" if parsed else f" Due: {due_date}"
+
         if task_title:
             add_task(task_title, due_date=due_date)
 
@@ -58,27 +63,27 @@ def chat():
     #  SHOW TASKS
     elif intent == "show_tasks":
         tasks = get_tasks()
-
         if not tasks:
             return jsonify({"response": "You have no pending tasks! 🎉"})
 
         lines = []
+        task_data_list = []  # NEW
         for task in tasks:
             line = f"• [ID: {task['id']}] {task['title']}"
-
             if task["due_date"]:
                 try:
-                    formatted = datetime.strptime(task["due_date"], "%Y-%m-%d %H:%M") \
-                                        .strftime("%d %b %H:%M")
-                    line += f" (Due: {formatted})"
+                    parsed = dateparser.parse(task["due_date"])
+                    formatted = parsed.strftime("%d %b %H:%M") if parsed else task["due_date"]
                 except:
-                    line += f" (Due: {task['due_date']})"
-
+                    formatted = task["due_date"]
+                line += f" (Due: {formatted})"
             lines.append(line)
+            task_data_list.append({"id": task["id"], "title": task["title"]})  # NEW
 
         return jsonify({
-            "response": "Here are your tasks:<br>" + "<br>".join(lines)
-        })
+            "response": "Here are your tasks:<br>" + "<br>".join(lines),
+            "tasks": task_data_list  # NEW
+    })
 
     #  TODAY
     elif intent == "tasks_today":
