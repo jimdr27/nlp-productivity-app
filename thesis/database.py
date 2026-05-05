@@ -10,20 +10,19 @@ def get_connection():
     return conn
 
 def init_db():
-    conn = get_connection()
+    with get_connection() as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS tasks (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                due_date TEXT,
+                status TEXT DEFAULT 'pending'
+            )
+        """)
+        conn.commit()
 
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS tasks (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            due_date TEXT,
-            status TEXT DEFAULT 'pending'
-        )
-    """)
-
-    conn.commit()
-    conn.close()
     print("Database initialized successfully!")
 
 if __name__ == "__main__":
     init_db()
+    

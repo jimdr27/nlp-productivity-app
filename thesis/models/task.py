@@ -7,3 +7,4 @@ class Task:
     title: str
     due_date: Optional[str] = None
     status: str = "pending"
+    
