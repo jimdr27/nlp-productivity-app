@@ -23,7 +23,7 @@ def chat():
         due_date = parsed_data["due_date"]
 
         if task_title:
-            add_task(task_title, due_date)
+            add_task(task_title, due_date=due_date)
 
             date_msg = ""
             if due_date:

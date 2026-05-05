@@ -30,19 +30,21 @@ def parse_message(user_input):
 
         date_words = set()
 
+        # First try full sentence (stronger)
+        parsed_date = dateparser.parse(
+            user_input,
+            settings={
+                "PREFER_DATES_FROM": "future",
+                "RELATIVE_BASE": datetime.now()
+            }
+        )
+
+        if parsed_date:
+            extracted_data["due_date"] = parsed_date.strftime("%Y-%m-%d %H:%M")
+
+        # Then use entities only for cleanup
         for ent in doc.ents:
             if ent.label_ in ("DATE", "TIME"):
-                parsed_date = dateparser.parse(
-                    ent.text,
-                    settings={
-                        "PREFER_DATES_FROM": "future",
-                        "RELATIVE_BASE": datetime.now()
-                    }
-                )
-
-                if parsed_date and not extracted_data["due_date"]:
-                    extracted_data["due_date"] = parsed_date.strftime("%Y-%m-%d %H:%M")
-
                 for word in ent.text.lower().split():
                     date_words.add(word)
 
@@ -67,7 +69,7 @@ def parse_message(user_input):
             extracted_data["task_title"] = " ".join(task_words).strip().capitalize()
 
     #  TODAY
-    elif "today" in lemmas and set(lemmas) & {"show", "list"}:
+    elif "today" in lemmas:
         extracted_data["intent"] = "tasks_today"
 
     #  SHOW TASKS
