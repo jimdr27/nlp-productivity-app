@@ -5,6 +5,21 @@ from chatbot.chatbot_engine import parse_message
 
 task_bp = Blueprint("tasks", __name__)
 
+@task_bp.route("/test-nlp", methods=["POST"])
+def test_nlp():
+    """Test endpoint to see NLP parsing results"""
+    data = request.get_json()
+    message = data.get("message", "")
+    
+    if not message:
+        return jsonify({"error": "No message provided"}), 400
+    
+    parsed = parse_message(message)
+    return jsonify({
+        "original": message,
+        "parsed": parsed
+    })
+
 
 @task_bp.route("/chat", methods=["POST"])
 def chat():

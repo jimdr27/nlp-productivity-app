@@ -24,9 +24,12 @@ def parse_message(user_input):
 
     lemmas = [token.lemma_ for token in doc]
 
-    #  ADD TASK
+    # First, determine the intent
+    intent = "unknown"  # Define intent variable BEFORE using it
+    
+    # ADD TASK
     if set(lemmas) & {"add", "remind", "create"}:
-        extracted_data["intent"] = "add_task"
+        intent = "add_task"
 
         date_words = set()
 
@@ -68,30 +71,67 @@ def parse_message(user_input):
         if task_words:
             extracted_data["task_title"] = " ".join(task_words).strip().capitalize()
 
-    #  TODAY
+    # TODAY
     elif "today" in lemmas:
-        extracted_data["intent"] = "tasks_today"
+        intent = "tasks_today"
 
-    #  SHOW TASKS
+    # SHOW TASKS
     elif set(lemmas) & {"show", "list"}:
-        extracted_data["intent"] = "show_tasks"
+        intent = "show_tasks"
 
-    #  COMPLETE TASK
+    # COMPLETE TASK
     elif set(lemmas) & {"complete", "finish", "done"}:
-        extracted_data["intent"] = "complete_task"
+        intent = "complete_task"
 
         for token in doc:
             if token.like_num:
                 extracted_data["task_id"] = int(token.text)
                 break
 
-    #  DELETE TASK
+    # DELETE TASK
     elif set(lemmas) & {"delete", "remove", "cancel"}:
-        extracted_data["intent"] = "delete_task"
+        intent = "delete_task"
 
         for token in doc:
             if token.like_num:
                 extracted_data["task_id"] = int(token.text)
                 break
+    
+    # Set the intent in the extracted data
+    extracted_data["intent"] = intent
+    
+    # NOW we can check if we need fallback title extraction
+    if intent == "add_task" and not extracted_data["task_title"]:
+        extracted_data["task_title"] = _extract_task_title_fallback(doc, user_input)
 
     return extracted_data
+
+
+def _extract_task_title_fallback(doc, user_input):
+    """Fallback method to extract task title from user input"""
+    # Remove common prefixes
+    prefixes = [
+        "add", "create", "remind me to", "remind me", "please", "could you",
+        "can you", "i need to", "i want to", "i have to"
+    ]
+    
+    cleaned_input = user_input.lower().strip()
+    for prefix in prefixes:
+        if cleaned_input.startswith(prefix):
+            cleaned_input = cleaned_input[len(prefix):].strip()
+            break  # Only remove the first matching prefix
+    
+    # Remove common suffixes
+    suffixes = [
+        "to my list", "to my task", "to my tasks", "please", "thanks", "thank you"
+    ]
+    for suffix in suffixes:
+        if cleaned_input.endswith(suffix):
+            cleaned_input = cleaned_input[:-len(suffix)].strip()
+            break  # Only remove the first matching suffix
+    
+    # If we have something meaningful left, use it as the title
+    if cleaned_input and len(cleaned_input) > 1:
+        return cleaned_input.capitalize()
+    
+    return None

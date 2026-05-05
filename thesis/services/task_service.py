@@ -1,15 +1,17 @@
 from database import get_connection
+from models.task import Task
+from typing import List, Optional
 
-def add_task(task_title, due_date=None):
+def add_task(task_title: str, due_date: Optional[str] = None) -> int:
     with get_connection() as conn:
-        conn.execute(
+        cursor = conn.execute(
             "INSERT INTO tasks (title, due_date) VALUES (?, ?)",
             (task_title, due_date)
         )
         conn.commit()
+        return cursor.lastrowid
 
-
-def get_tasks():
+def get_tasks() -> List[Task]:
     with get_connection() as conn:
         rows = conn.execute("""
             SELECT id, title, due_date, status
@@ -17,22 +19,20 @@ def get_tasks():
             WHERE status = 'pending'
             ORDER BY id DESC
         """).fetchall()
+        
+        return [Task(**dict(row)) for row in rows]
 
-        return [dict(row) for row in rows]
-
-
-def complete_task(task_id):
+def complete_task(task_id: int) -> bool:
     with get_connection() as conn:
         cursor = conn.cursor()
         cursor.execute(
-            "UPDATE tasks SET status = 'completed' WHERE id = ?",
+            "UPDATE tasks SET status = 'done' WHERE id = ?",
             (task_id,)
         )
         conn.commit()
         return cursor.rowcount > 0
 
-
-def delete_task(task_id):
+def delete_task(task_id: int) -> bool:
     with get_connection() as conn:
         cursor = conn.cursor()
         cursor.execute(
@@ -41,4 +41,3 @@ def delete_task(task_id):
         )
         conn.commit()
         return cursor.rowcount > 0
-    
