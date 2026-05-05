@@ -67,23 +67,24 @@ def chat():
             return jsonify({"response": "You have no pending tasks! 🎉"})
 
         lines = []
-        task_data_list = []  # NEW
+        task_data_list = []  
         for task in tasks:
-            line = f"• [ID: {task['id']}] {task['title']}"
-            if task["due_date"]:
+            # FIX: Use task.id, task.title, task.due_date
+            line = f"• [ID: {task.id}] {task.title}"
+            if task.due_date:
                 try:
-                    parsed = dateparser.parse(task["due_date"])
-                    formatted = parsed.strftime("%d %b %H:%M") if parsed else task["due_date"]
+                    parsed = dateparser.parse(task.due_date)
+                    formatted = parsed.strftime("%d %b %H:%M") if parsed else task.due_date
                 except:
-                    formatted = task["due_date"]
+                    formatted = task.due_date
                 line += f" (Due: {formatted})"
             lines.append(line)
-            task_data_list.append({"id": task["id"], "title": task["title"]})  # NEW
+            task_data_list.append({"id": task.id, "title": task.title})  
 
         return jsonify({
             "response": "Here are your tasks:<br>" + "<br>".join(lines),
-            "tasks": task_data_list  # NEW
-    })
+            "tasks": task_data_list  
+        })
 
     #  TODAY
     elif intent == "tasks_today":
@@ -91,15 +92,16 @@ def chat():
 
         tasks = [
             t for t in get_tasks()
-            if t["due_date"] and t["due_date"].startswith(today)
+            # FIX: Use t.due_date
+            if t.due_date and t.due_date.startswith(today)
         ]
 
         if not tasks:
             return jsonify({"response": "No tasks due today 🎉"})
 
         return jsonify({
-            "response": "Tasks due today:<br>" +
-                        "<br>".join([f"• {t['title']}" for t in tasks])
+            # FIX: Use t.title
+            "response": "Tasks due today:<br>" + "<br>".join([f"• {t.title}" for t in tasks])
         })
 
     #  COMPLETE

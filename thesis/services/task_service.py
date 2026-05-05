@@ -26,7 +26,7 @@ def complete_task(task_id: int) -> bool:
     with get_connection() as conn:
         cursor = conn.cursor()
         cursor.execute(
-            "UPDATE tasks SET status = 'done' WHERE id = ?",
+            "UPDATE tasks SET status = 'completed' WHERE id = ?",
             (task_id,)
         )
         conn.commit()

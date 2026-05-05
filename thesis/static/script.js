@@ -100,16 +100,6 @@ async function sendMessage(forcedMessage = null) {
         </div>
     `);
 
-    // In sendMessage(), replace the task check:
-    if (data.tasks && data.tasks.length > 0) {
-        // Show first task's actions OR create task list with buttons
-        data.tasks.forEach(task => {
-            addBotMessageWithActions(`Task ${task.id}: ${task.title}`, task);
-        });
-    } else {
-        addMessage("bot", sanitizeResponse(data.response));
-    }
-
     try {
         const response = await fetch("/api/chat", {
             method: "POST",
@@ -122,9 +112,17 @@ async function sendMessage(forcedMessage = null) {
         await new Promise(r => setTimeout(r, 300));
         document.getElementById(typingId)?.remove();
 
-        if (data.task) {
-            addBotMessageWithActions(data.response, data.task);
+        // ✅ CORRECT PLACEMENT: Check the data after we actually fetch it!
+        if (data.tasks && data.tasks.length > 0) {
+            // 1. First, show the main text list of tasks
+            addMessage("bot", sanitizeResponse(data.response)); 
+            
+            // 2. Then, create the actionable buttons for each task
+            data.tasks.forEach(task => {
+                addBotMessageWithActions(`Manage Task: ${task.title}`, task);
+            });
         } else {
+            // Standard text response
             addMessage("bot", sanitizeResponse(data.response));
         }
 
