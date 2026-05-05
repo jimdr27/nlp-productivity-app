@@ -17,7 +17,7 @@ def get_connection():
         raise
     finally:
         conn.close()
-    return conn
+    
 
 def init_db():
     with get_connection() as conn:

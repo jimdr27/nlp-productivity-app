@@ -179,13 +179,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // In script.js DOMContentLoaded, test connection
     async function testConnection() {
-        try {
-            await fetch("/api/test-nlp", {method: "POST", body: JSON.stringify({message: "test"})});
-            document.getElementById("status-dot").style.background = "var(--accent)";
-        } catch(e) {
-            document.getElementById("status-dot").style.background = "#ff4757";
-        }
+    try {
+        await fetch("/api/test-nlp", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },  // add this
+            body: JSON.stringify({ message: "test" })
+        });
+        document.getElementById("status-dot").style.background = "var(--accent)";
+    } catch(e) {
+        document.getElementById("status-dot").style.background = "#ff4757";
     }
+}
     testConnection();
 
 });
