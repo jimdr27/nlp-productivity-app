@@ -6,7 +6,7 @@ from chatbot.chatbot_engine import parse_message
 task_bp = Blueprint("tasks", __name__)
 
 
-@task_bp.route("/api/chat", methods=["POST"])
+@task_bp.route("/chat", methods=["POST"])
 def chat():
     data = request.get_json()
     message = data.get("message")
