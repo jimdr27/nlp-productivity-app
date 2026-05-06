@@ -11,8 +11,6 @@
     --text: #e8e8e8;
     --text-muted: #666;
     --radius: 16px;
-    --font-body: 'DM Sans', sans-serif;
-    --font-mono: 'DM Mono', monospace;
 }
 
 * {
@@ -24,39 +22,31 @@
 body {
     background: var(--bg);
     color: var(--text);
-    font-family: var(--font-body);
-    min-height: 100vh;
+    font-family: 'DM Sans', sans-serif;
     display: flex;
-    align-items: center;
     justify-content: center;
-    padding: 10px;
+    align-items: center;
+    height: 100vh;
 }
 
 #app {
     width: 100%;
     max-width: 680px;
-    height: 100vh;
+    height: 95vh;
     display: flex;
     flex-direction: column;
     gap: 16px;
 }
 
 /* Header */
+#header {
+    position: relative;
+}
+
 .header-title {
     display: flex;
     align-items: center;
     gap: 10px;
-}
-
-#header h1 {
-    font-family: var(--font-mono);
-    font-size: 1.4rem;
-    color: var(--accent);
-}
-
-#header {
-    padding: 8px 4px;
-    position: relative;  /* add this */
 }
 
 #status-dot {
@@ -68,14 +58,12 @@ body {
 }
 
 @keyframes pulse {
-    0%, 100% { opacity: 1; }
     50% { opacity: 0.3; }
 }
 
 #subtitle {
     font-size: 0.8rem;
     color: var(--text-muted);
-    font-family: var(--font-mono);
 }
 
 /* Chatbox */
@@ -89,22 +77,16 @@ body {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    scroll-behavior: smooth;
+}
+
+#chatbox:empty::before {
+    content: "Start typing to add your first task...";
+    color: var(--text-muted);
 }
 
 /* Messages */
-.user-message,
-.bot-message {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    max-width: 85%;
-    animation: fadeUp 0.2s ease;
-}
-
-@keyframes fadeUp {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
+.user-message, .bot-message {
+    max-width: 80%;
 }
 
 .user-message {
@@ -115,40 +97,40 @@ body {
     align-self: flex-start;
 }
 
-.label {
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    color: var(--text-muted);
-}
-
 .bubble {
     padding: 10px 14px;
     border-radius: 12px;
-    font-size: 0.92rem;
-    line-height: 1.6;
 }
 
 .user-message .bubble {
     background: var(--user-dim);
-    border: 1px solid rgba(74, 158, 255, 0.2);
     color: var(--user-color);
 }
 
 .bot-message .bubble {
     background: var(--accent-dim);
-    border: 1px solid rgba(0, 229, 160, 0.15);
 }
 
-/* Typing animation */
-.typing-indicator .bubble::after {
-    content: " .";
-    animation: dots 1.2s infinite;
+/* Actions */
+.message-actions {
+    margin-top: 8px;
+    display: flex;
+    gap: 6px;
 }
 
-@keyframes dots {
-    0% { content: " ."; }
-    33% { content: " .."; }
-    66% { content: " ..."; }
+.action-btn {
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+}
+
+.complete-btn {
+    background: rgba(0,229,160,0.2);
+}
+
+.delete-btn {
+    background: rgba(255,99,71,0.2);
 }
 
 /* Input */
@@ -157,107 +139,19 @@ body {
     gap: 10px;
 }
 
-#userInput {
+input {
     flex: 1;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 12px 16px;
-    color: var(--text);
-    outline: none;
-}
-
-#userInput:focus {
-    border-color: var(--accent);
+    padding: 10px;
 }
 
 button {
-    background: var(--accent);
-    color: black;
-    border: none;
-    border-radius: 12px;
-    padding: 12px 22px;
+    padding: 10px;
     cursor: pointer;
-    transition: 0.2s;
 }
 
-button:hover {
-    opacity: 0.9;
-}
-
-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-/* Message action buttons */
-.message-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid var(--border);
-}
-
-.action-btn {
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 0.8rem;
-    font-family: var(--font-mono);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    border: 1px solid transparent;
-}
-
-.complete-btn {
-    background: rgba(0, 229, 160, 0.15);
-    color: var(--accent);
-    border-color: rgba(0, 229, 160, 0.3);
-}
-
-.complete-btn:hover {
-    background: rgba(0, 229, 160, 0.25);
-}
-
-.delete-btn {
-    background: rgba(255, 99, 71, 0.15);
-    color: #ff6347;
-    border-color: rgba(255, 99, 71, 0.3);
-}
-
-.delete-btn:hover {
-    background: rgba(255, 99, 71, 0.25);
-}
-
-
+/* Clear button */
 .clear-btn {
-    background: transparent;
-    color: var(--text-muted);
-    border: 1px solid var(--border);
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 0.8rem;
-    cursor: pointer;
-    transition: all 0.2s;
     position: absolute;
-    top: 20px;
-    right: 20px;
-}
-
-.clear-btn:hover {
-    color: var(--text);
-    border-color: var(--text-muted);
-}
-
-.message-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.timestamp {
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    color: var(--text-muted);
-    opacity: 0.7;
+    right: 0;
+    top: 0;
 }
