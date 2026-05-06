@@ -8,8 +8,8 @@ def add_task(task_title: str, due_date: Optional[str] = None) -> int:
             "INSERT INTO tasks (title, due_date) VALUES (?, ?)",
             (task_title, due_date)
         )
-        conn.commit()
         return cursor.lastrowid
+
 
 def get_tasks() -> List[Task]:
     with get_connection() as conn:
@@ -19,25 +19,24 @@ def get_tasks() -> List[Task]:
             WHERE status = 'pending'
             ORDER BY id DESC
         """).fetchall()
-        
+
         return [Task(**dict(row)) for row in rows]
+
 
 def complete_task(task_id: int) -> bool:
     with get_connection() as conn:
-        cursor = conn.cursor()
-        cursor.execute(
+        cursor = conn.execute(
             "UPDATE tasks SET status = 'completed' WHERE id = ?",
             (task_id,)
         )
-        conn.commit()
         return cursor.rowcount > 0
+
 
 def delete_task(task_id: int) -> bool:
     with get_connection() as conn:
-        cursor = conn.cursor()
-        cursor.execute(
+        cursor = conn.execute(
             "DELETE FROM tasks WHERE id = ?",
             (task_id,)
         )
-        conn.commit()
         return cursor.rowcount > 0
+    

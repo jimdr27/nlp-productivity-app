@@ -1,9 +1,6 @@
 import sqlite3
-import os
 from contextlib import contextmanager
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "database.db")
+from config import DB_PATH
 
 @contextmanager
 def get_connection():
@@ -17,7 +14,7 @@ def get_connection():
         raise
     finally:
         conn.close()
-    
+
 
 def init_db():
     with get_connection() as conn:
@@ -26,11 +23,13 @@ def init_db():
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 title TEXT NOT NULL,
                 due_date TEXT,
-                status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'completed'))
+                status TEXT DEFAULT 'pending'
+                CHECK(status IN ('pending', 'completed'))
             )
         """)
-        conn.commit()
+
     print("Database initialized successfully!")
+
 
 if __name__ == "__main__":
     init_db()
