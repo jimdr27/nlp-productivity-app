@@ -53,8 +53,7 @@ def chat():
 
             if t.due_date:
                 try:
-                    formatted = datetime.strptime(t.due_date, "%Y-%m-%d %H:%M") \
-                                        .strftime("%d %b %H:%M")
+                    formatted = datetime.strptime(t.due_date, "%Y-%m-%d %H:%M").strftime("%d %b %H:%M")
                     line += f" (Due: {formatted})"
                 except:
                     line += f" (Due: {t.due_date})"
@@ -63,7 +62,6 @@ def chat():
 
         return jsonify({
             "response": "Here are your tasks:<br>" + "<br>".join(lines)
-            
         })
 
     # 📅 TASKS DUE TODAY

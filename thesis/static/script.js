@@ -24,23 +24,7 @@ function addMessage(type, text) {
     chatbox.scrollTop = chatbox.scrollHeight;
 }
 
-function addTaskMessage(task) {
-    const chatbox = document.getElementById("chatbox");
 
-    chatbox.insertAdjacentHTML("beforeend", `
-        <div class="bot-message">
-            <div class="bubble">
-                • ${escapeHTML(task.title)}
-                <div class="message-actions">
-                    <button onclick="sendMessage('complete task ${task.id}')" class="action-btn complete-btn">✓</button>
-                    <button onclick="sendMessage('delete task ${task.id}')" class="action-btn delete-btn">✕</button>
-                </div>
-            </div>
-        </div>
-    `);
-
-    chatbox.scrollTop = chatbox.scrollHeight;
-}
 
 async function sendMessage(forcedMessage = null) {
     const input = document.getElementById("userInput");
@@ -58,7 +42,7 @@ async function sendMessage(forcedMessage = null) {
     btn.innerHTML = "⏳";
 
     try {
-        const res = await fetch("/api/chat", {
+        const res = await fetch("/api/chat", { 
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({message})
@@ -66,6 +50,7 @@ async function sendMessage(forcedMessage = null) {
 
         const data = await res.json();
 
+        // Just print the text response, no extra buttons!
         addMessage("bot", data.response);
 
     } catch {
