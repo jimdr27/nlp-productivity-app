@@ -7,7 +7,6 @@ nlp = None
 def get_nlp():
     global nlp
     if nlp is None:
-        print("Loading AI Model...")
         nlp = spacy.load("en_core_web_sm")
     return nlp
 
@@ -23,29 +22,39 @@ def parse_message(user_input):
     }
 
     lemmas = [token.lemma_ for token in doc]
-    intent = "unknown"
 
-    # ➕ ADD TASK
+    #  ADD TASK
     if set(lemmas) & {"add", "remind", "create"}:
-        intent = "add_task"
+        extracted_data["intent"] = "add_task"
 
-        parsed_date = dateparser.parse(
-            user_input,
-            settings={
-                "PREFER_DATES_FROM": "future",
-                "RELATIVE_BASE": datetime.now()
-            }
-        )
+        date_words = set()
 
-        if parsed_date:
-            extracted_data["due_date"] = parsed_date.strftime("%Y-%m-%d %H:%M")
+        #  Better date extraction (targeted)
+        for ent in doc.ents:
+            if ent.label_ in ("DATE", "TIME"):
+                parsed_date = dateparser.parse(
+                    ent.text,
+                    settings={
+                        "PREFER_DATES_FROM": "future",
+                        "RELATIVE_BASE": datetime.now()
+                    }
+                )
 
+                if parsed_date:
+                    extracted_data["due_date"] = parsed_date.strftime("%Y-%m-%d %H:%M")
+
+                for word in ent.text.lower().split():
+                    date_words.add(word)
+
+        # Clean words
         filler_words = {
             "add", "remind", "me", "to", "create", "a", "task",
             "please", "could", "you", "for", "at", "by", "on", "my", "list"
         }
 
-        date_words = {"today", "tomorrow", "tonight", "next", "this", "in", "am", "pm"}
+        date_words.update({
+            "today", "tomorrow", "tonight", "next", "this", "in", "am", "pm"
+        })
 
         task_words = [
             token.text for token in doc
@@ -55,19 +64,20 @@ def parse_message(user_input):
         ]
 
         if task_words:
-            extracted_data["task_title"] = " ".join(task_words).strip().capitalize()
+            extracted_data["task_title"] = " ".join(task_words).capitalize()
 
     #  SHOW
     elif set(lemmas) & {"show", "list"}:
-        intent = "show_tasks"
+        extracted_data["intent"] = "show_tasks"
 
     #  TODAY
     elif "today" in lemmas:
-        intent = "tasks_today"
+        extracted_data["intent"] = "tasks_today"
 
     #  COMPLETE
     elif set(lemmas) & {"complete", "finish", "done"}:
-        intent = "complete_task"
+        extracted_data["intent"] = "complete_task"
+
         for token in doc:
             if token.like_num:
                 extracted_data["task_id"] = int(token.text)
@@ -75,15 +85,15 @@ def parse_message(user_input):
 
     #  DELETE
     elif set(lemmas) & {"delete", "remove", "cancel"}:
-        intent = "delete_task"
+        extracted_data["intent"] = "delete_task"
+
         for token in doc:
             if token.like_num:
                 extracted_data["task_id"] = int(token.text)
                 break
 
-    extracted_data["intent"] = intent
-
-    if intent == "add_task" and not extracted_data["task_title"]:
+    # Fallback title
+    if extracted_data["intent"] == "add_task" and not extracted_data["task_title"]:
         extracted_data["task_title"] = user_input.strip().capitalize()
 
     return extracted_data

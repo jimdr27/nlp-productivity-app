@@ -58,7 +58,7 @@ async function sendMessage(forcedMessage = null) {
     btn.innerHTML = "⏳";
 
     try {
-        const res = await fetch("/api/chat", {
+        const res = await fetch("/chat", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({message})
@@ -66,11 +66,7 @@ async function sendMessage(forcedMessage = null) {
 
         const data = await res.json();
 
-        if (data.tasks) {
-            data.tasks.forEach(addTaskMessage);
-        } else {
-            addMessage("bot", data.response);
-        }
+        addMessage("bot", data.response);
 
     } catch {
         addMessage("bot", "⚠️ Server error");
