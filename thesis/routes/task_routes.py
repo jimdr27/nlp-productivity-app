@@ -5,6 +5,14 @@ from chatbot.chatbot_engine import parse_message
 
 task_bp = Blueprint("tasks", __name__)
 
+@task_bp.route("/test-nlp", methods=["POST"])
+def test_nlp():
+    data = request.get_json()
+    message = data.get("message", "")
+    if not message:
+        return jsonify({"error": "No message provided"}), 400
+    parsed = parse_message(message)
+    return jsonify({"original": message, "parsed": parsed})
 
 @task_bp.route("/chat", methods=["POST"])
 def chat():
@@ -48,20 +56,21 @@ def chat():
             return jsonify({"response": "You have no pending tasks! 🎉"})
 
         lines = []
+        task_data_list = []  # add this
         for t in tasks:
             line = f"• [ID: {t.id}] {t.title}"
-
             if t.due_date:
                 try:
                     formatted = datetime.strptime(t.due_date, "%Y-%m-%d %H:%M").strftime("%d %b %H:%M")
                     line += f" (Due: {formatted})"
                 except:
                     line += f" (Due: {t.due_date})"
-
             lines.append(line)
+            task_data_list.append({"id": t.id, "title": t.title})  # add this
 
         return jsonify({
-            "response": "Here are your tasks:<br>" + "<br>".join(lines)
+            "response": "Here are your tasks:<br>" + "<br>".join(lines),
+            "tasks": task_data_list  # add this
         })
 
     # 📅 TASKS DUE TODAY

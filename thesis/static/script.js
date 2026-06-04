@@ -5,7 +5,9 @@ function escapeHTML(str) {
 }
 
 function sanitizeResponse(str) {
-    return escapeHTML(str).replace(/\n/g, "<br>");
+    return escapeHTML(str)
+        .replace(/\n/g, "<br>")
+        .replace(/&lt;br&gt;/gi, "<br>");  // restore <br> after escaping
 }
 
 function addMessage(type, text) {
