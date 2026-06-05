@@ -25,7 +25,7 @@ def chat():
     parsed = parse_message(message)
     intent = parsed["intent"]
 
-    # ➕ ADD TASK
+    #  ADD TASK
     if intent == "add_task":
         title = parsed["task_title"]
         due = parsed["due_date"]
@@ -47,33 +47,38 @@ def chat():
         return jsonify({
             "response": f"Got it! I added '{title}'.{date_msg}"
         })
+    
+    #  COMPLETE TASK
+    elif intent == "complete_task":
+        task_id = parsed["task_id"]
 
-    # 📋 SHOW TASKS
-    elif intent == "show_tasks":
-        tasks = get_tasks()
+        if task_id is None:
+            return jsonify({
+                "response": "Which task ID would you like to complete? (e.g., 'complete task 2')"
+            })
 
-        if not tasks:
-            return jsonify({"response": "You have no pending tasks! 🎉"})
+        if complete_task(task_id):
+            return jsonify({"response": f"Task {task_id} completed!"})
 
-        lines = []
-        task_data_list = []  # add this
-        for t in tasks:
-            line = f"• [ID: {t.id}] {t.title}"
-            if t.due_date:
-                try:
-                    formatted = datetime.strptime(t.due_date, "%Y-%m-%d %H:%M").strftime("%d %b %H:%M")
-                    line += f" (Due: {formatted})"
-                except:
-                    line += f" (Due: {t.due_date})"
-            lines.append(line)
-            task_data_list.append({"id": t.id, "title": t.title})  # add this
+        return jsonify({"response": f"I couldn't find a task with ID {task_id}."})
 
-        return jsonify({
-            "response": "Here are your tasks:<br>" + "<br>".join(lines),
-            "tasks": task_data_list  # add this
-        })
+    #  DELETE TASK
+    elif intent == "delete_task":
+        task_id = parsed["task_id"]
 
-    # 📅 TASKS DUE TODAY
+        if task_id is None:
+            return jsonify({
+                "response": "Which task ID would you like to delete? (e.g., 'delete task 3')"
+            })
+
+        if delete_task(task_id):
+            return jsonify({"response": f"Task {task_id} deleted."})
+
+        return jsonify({"response": f"I couldn't find a task with ID {task_id}."})
+
+
+
+    #  TASKS DUE TODAY
     elif intent == "tasks_today":
         today = datetime.now().strftime("%Y-%m-%d")
 
@@ -90,35 +95,35 @@ def chat():
                         "<br>".join([f"• {t.title}" for t in tasks])
         })
 
-    # ✅ COMPLETE TASK
-    elif intent == "complete_task":
-        task_id = parsed["task_id"]
+    #  SHOW TASKS
+    elif intent == "show_tasks":
+        tasks = get_tasks()
 
-        if task_id is None:
-            return jsonify({
-                "response": "Which task ID would you like to complete? (e.g., 'complete task 2')"
-            })
+        if not tasks:
+            return jsonify({"response": "You have no pending tasks! 🎉"})
 
-        if complete_task(task_id):
-            return jsonify({"response": f"Task {task_id} completed!"})
+        lines = []
+        task_data_list = []  
+        for t in tasks:
+            line = f"• [ID: {t.id}] {t.title}"
+            if t.due_date:
+                try:
+                    formatted = datetime.strptime(t.due_date, "%Y-%m-%d %H:%M").strftime("%d %b %H:%M")
+                    line += f" (Due: {formatted})"
+                except:
+                    line += f" (Due: {t.due_date})"
+            lines.append(line)
+            task_data_list.append({"id": t.id, "title": t.title})  
 
-        return jsonify({"response": f"I couldn't find a task with ID {task_id}."})
+        return jsonify({
+            "response": "Here are your tasks:<br>" + "<br>".join(lines),
+            "tasks": task_data_list  
+        })
 
-    # ❌ DELETE TASK
-    elif intent == "delete_task":
-        task_id = parsed["task_id"]
+    
 
-        if task_id is None:
-            return jsonify({
-                "response": "Which task ID would you like to delete? (e.g., 'delete task 3')"
-            })
-
-        if delete_task(task_id):
-            return jsonify({"response": f"Task {task_id} deleted."})
-
-        return jsonify({"response": f"I couldn't find a task with ID {task_id}."})
-
-    # 🤖 DEFAULT FALLBACK
+    
+    #  DEFAULT FALLBACK
     return jsonify({
         "response": f"I didn't understand '{message}'. Try: add, show, complete, delete, or 'today'."
     })

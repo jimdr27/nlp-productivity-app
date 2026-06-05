@@ -23,7 +23,8 @@ def init_db():
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 title TEXT NOT NULL,
                 due_date TEXT,
-                status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'completed'))
+                status TEXT DEFAULT 'pending',
+                CHECK(status IN ('pending', 'completed'))
             )
         """)
     print("Database initialized successfully!")

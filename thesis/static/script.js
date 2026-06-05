@@ -7,7 +7,7 @@ function escapeHTML(str) {
 function sanitizeResponse(str) {
     return escapeHTML(str)
         .replace(/\n/g, "<br>")
-        .replace(/&lt;br&gt;/gi, "<br>");  // restore <br> after escaping
+        .replace(/&lt;br&gt;/gi, "<br>");  
 }
 
 function addMessage(type, text) {
@@ -52,7 +52,7 @@ async function sendMessage(forcedMessage = null) {
 
         const data = await res.json();
 
-        // Just print the text response, no extra buttons!
+        
         addMessage("bot", data.response);
 
     } catch {
