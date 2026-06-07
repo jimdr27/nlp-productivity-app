@@ -39,7 +39,7 @@ def chat():
     parsed = parse_message(message)
     intent = parsed["intent"]
     log_interaction(message, intent)
-    
+
 
     #  ADD TASK
     if intent == "add_task":
@@ -77,6 +77,12 @@ def chat():
             return jsonify({"response": f"Task {task_id} completed!"})
 
         return jsonify({"response": f"I couldn't find a task with ID {task_id}."})
+
+    #  GREETING
+    elif intent == "greeting":
+        return jsonify({
+            "response": "Hello! I'm your task assistant. You can try:<br>• add buy groceries<br>• show tasks<br>• complete task 1<br>• delete task 2<br>• show tasks today"
+        })
 
     #  DELETE TASK
     elif intent == "delete_task":
@@ -136,10 +142,25 @@ def chat():
             "tasks": task_data_list  
         })
 
-    
+    elif intent == "unknown_hint":
+        return jsonify({
+            "response": (
+                f"Did you want to add something? Try:<br>"
+                f"• <b>add</b> {message}<br><br>"
+                f"Or type <b>show tasks</b> to see your list."
+            )
+        })
 
     
-    #  DEFAULT FALLBACK
+    # DEFAULT FALLBACK
     return jsonify({
-        "response": f"I didn't understand '{message}'. Try: add, show, complete, delete, or 'today'."
+        "response": (
+            "I didn't quite understand that.<br><br>"
+            "Here's what I can do:<br>"
+            "• <b>add</b> buy groceries<br>"
+            "• <b>show</b> tasks<br>"
+            "• <b>complete</b> task 1<br>"
+            "• <b>delete</b> task 3<br>"
+            "• <b>show</b> tasks today"
+        )
     })

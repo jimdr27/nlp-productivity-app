@@ -108,6 +108,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const input = document.getElementById("userInput");
     const btn = document.getElementById("sendBtn");
 
+    // Initial greeting
+    addMessage("bot", "Hello! I'm your task assistant.<br><br>You can try:<br>• add buy groceries<br>• show tasks<br>• complete task 1<br>• delete task 2<br>• show tasks today");
+
     input.focus();
 
     input.addEventListener("keydown", e => {
@@ -118,8 +121,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("clearChat").onclick = () => {
         document.getElementById("chatbox").innerHTML = "";
+        addMessage("bot", "Chat cleared! How can I help you?");
     };
 
-    loadTasks();  // load tasks on page open
+    loadTasks();
 });
 

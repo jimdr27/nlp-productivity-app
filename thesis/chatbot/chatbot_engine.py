@@ -83,6 +83,11 @@ def parse_message(user_input):
                 extracted_data["task_id"] = int(token.text)
                 break
 
+    # GREETING
+    elif set(lemmas) & {"hi", "hello", "hey", "greet", "morning", "afternoon", "evening"}:
+        extracted_data["intent"] = "greeting"
+
+
     #  DELETE
     elif set(lemmas) & {"delete", "remove", "cancel"}:
         extracted_data["intent"] = "delete_task"
@@ -92,8 +97,13 @@ def parse_message(user_input):
                 extracted_data["task_id"] = int(token.text)
                 break
 
+    
     # Fallback title
     if extracted_data["intent"] == "add_task" and not extracted_data["task_title"]:
         extracted_data["task_title"] = user_input.strip().capitalize()
+
+    # FALLBACK HINT — looks like a task description but no intent found
+    if extracted_data["intent"] == "unknown" and len(doc) >= 2:
+        extracted_data["intent"] = "unknown_hint"
 
     return extracted_data
