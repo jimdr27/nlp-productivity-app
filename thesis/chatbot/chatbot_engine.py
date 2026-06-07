@@ -66,13 +66,15 @@ def parse_message(user_input):
         if task_words:
             extracted_data["task_title"] = " ".join(task_words).capitalize()
 
+    #  TODAY
+    elif "today" in lemmas:
+        extracted_data["intent"] = "tasks_today"
+
     #  SHOW
     elif set(lemmas) & {"show", "list", "display", "see", "get", "view", "what"}:
         extracted_data["intent"] = "show_tasks"
 
-    #  TODAY
-    elif "today" in lemmas:
-        extracted_data["intent"] = "tasks_today"
+    
 
     #  COMPLETE
     elif set(lemmas) & {"complete", "finish", "done", "finished", "completed", "mark", "close", "check"}:
