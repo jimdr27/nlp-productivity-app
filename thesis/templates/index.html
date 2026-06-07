@@ -4,14 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Task Assistant</title>
-
     <link rel="stylesheet" href="/static/style.css">
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
-
 <body>
     <div id="app">
-        
+
         <div id="header">
             <div class="header-title">
                 <span id="status-dot"></span>
@@ -21,18 +19,32 @@
             <button id="clearChat" class="clear-btn">Clear</button>
         </div>
 
-        <div id="chatbox"></div>
+        <div id="main">
 
-        <div id="input-area">
-            <input 
-                type="text" 
-                id="userInput" 
-                placeholder="Type a message..." 
-                autocomplete="off"
-            >
-            <button id="sendBtn">Send</button>
+            <div id="chat-section">
+                <div id="chatbox" role="log" aria-live="polite" aria-label="Chat messages"></div>
+                <div id="input-area">
+                    <input
+                        type="text"
+                        id="userInput"
+                        placeholder="Type a message..."
+                        autocomplete="off"
+                    >
+                    <button id="sendBtn">Send</button>
+                </div>
+            </div>
+
+            <div id="task-panel">
+                <div id="task-panel-header">
+                    <span>Pending Tasks</span>
+                    <span id="task-count">0</span>
+                </div>
+                <div id="task-list">
+                    <p class="empty-msg">No pending tasks</p>
+                </div>
+            </div>
+
         </div>
-
     </div>
 
     <script src="/static/script.js"></script>

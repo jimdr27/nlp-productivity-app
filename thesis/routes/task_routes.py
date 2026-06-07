@@ -5,6 +5,19 @@ from chatbot.chatbot_engine import parse_message
 
 task_bp = Blueprint("tasks", __name__)
 
+@task_bp.route("/tasks", methods=["GET"])
+def get_all_tasks():
+    tasks = get_tasks()
+    return jsonify([
+        {
+            "id": t.id,
+            "title": t.title,
+            "due_date": t.due_date
+        }
+        for t in tasks
+    ])
+
+
 @task_bp.route("/test-nlp", methods=["POST"])
 def test_nlp():
     data = request.get_json()
