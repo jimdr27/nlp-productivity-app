@@ -24,7 +24,7 @@ def parse_message(user_input):
     lemmas = [token.lemma_ for token in doc]
 
     #  ADD TASK
-    if set(lemmas) & {"add", "remind", "create"}:
+    if set(lemmas) & {"add", "remind", "create", "schedule", "need", "want", "have", "make", "set"}:
         extracted_data["intent"] = "add_task"
 
         date_words = set()
@@ -67,7 +67,7 @@ def parse_message(user_input):
             extracted_data["task_title"] = " ".join(task_words).capitalize()
 
     #  SHOW
-    elif set(lemmas) & {"show", "list"}:
+    elif set(lemmas) & {"show", "list", "display", "see", "get", "view", "what"}:
         extracted_data["intent"] = "show_tasks"
 
     #  TODAY
@@ -75,7 +75,7 @@ def parse_message(user_input):
         extracted_data["intent"] = "tasks_today"
 
     #  COMPLETE
-    elif set(lemmas) & {"complete", "finish", "done"}:
+    elif set(lemmas) & {"complete", "finish", "done", "finished", "completed", "mark", "close", "check"}:
         extracted_data["intent"] = "complete_task"
 
         for token in doc:
@@ -84,18 +84,27 @@ def parse_message(user_input):
                 break
 
     # GREETING
-    elif set(lemmas) & {"hi", "hello", "hey", "greet", "morning", "afternoon", "evening"}:
+    elif set(lemmas) & {"hi", "hello", "hey", "greet", "morning", "afternoon", "evening", "sup", "howdy"}:
         extracted_data["intent"] = "greeting"
 
 
     #  DELETE
-    elif set(lemmas) & {"delete", "remove", "cancel"}:
+    elif set(lemmas) & {"delete", "remove", "cancel", "clear", "drop", "erase"}:
         extracted_data["intent"] = "delete_task"
 
         for token in doc:
             if token.like_num:
                 extracted_data["task_id"] = int(token.text)
                 break
+    
+    # HELP
+    elif set(lemmas) & {"help", "how", "what", "guide", "command", "instruction", "use"}:
+        extracted_data["intent"] = "help"
+
+    # COUNT TASKS
+    elif set(lemmas) & {"count", "many", "number", "total", "how"}:
+        if "task" in lemmas or "pending" in lemmas:
+            extracted_data["intent"] = "count_tasks"
 
     
     # Fallback title

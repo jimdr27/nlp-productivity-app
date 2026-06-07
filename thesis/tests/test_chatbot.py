@@ -48,3 +48,20 @@ def test_unknown_intent():
 def test_today_intent():
     result = parse_message("what tasks do I have today")
     assert result["intent"] == "tasks_today"
+
+def test_help_intent():
+    result = parse_message("help")
+    assert result["intent"] == "help"
+
+def test_count_tasks():
+    result = parse_message("how many tasks do I have")
+    assert result["intent"] == "count_tasks"
+
+def test_add_task_with_need():
+    result = parse_message("I need to call the doctor")
+    assert result["intent"] == "add_task"
+
+def test_add_task_with_schedule():
+    result = parse_message("schedule meeting tomorrow")
+    assert result["intent"] == "add_task"
+

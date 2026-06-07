@@ -141,6 +141,33 @@ def chat():
             "response": "Here are your tasks:<br>" + "<br>".join(lines),
             "tasks": task_data_list  
         })
+    
+    elif intent == "help":
+        return jsonify({
+            "response": (
+                "Here's what I understand:<br><br>"
+                "• <b>add</b> [task] — add a new task<br>"
+                "• <b>add</b> [task] <b>on/by</b> [date] — add with due date<br>"
+                "• <b>show tasks</b> — list all pending tasks<br>"
+                "• <b>show tasks today</b> — list tasks due today<br>"
+                "• <b>complete task</b> [id] — mark a task as done<br>"
+                "• <b>delete task</b> [id] — remove a task<br>"
+                "• <b>how many tasks</b> — count pending tasks<br><br>"
+                "You can also use the panel on the right to complete or delete tasks."
+            )
+        })
+
+    elif intent == "count_tasks":
+        tasks = get_tasks()
+        count = len(tasks)
+        if count == 0:
+            return jsonify({"response": "You have no pending tasks! Great job."})
+        elif count == 1:
+            return jsonify({"response": "You have <b>1</b> pending task."})
+        else:
+            return jsonify({"response": f"You have <b>{count}</b> pending tasks."})
+
+
 
     elif intent == "unknown_hint":
         return jsonify({
