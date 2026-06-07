@@ -1,7 +1,8 @@
 from flask import Blueprint, request, jsonify
 from datetime import datetime
-from services.task_service import add_task, get_tasks, complete_task, delete_task
+from services.task_service import add_task, get_tasks, complete_task, delete_task, log_interaction
 from chatbot.chatbot_engine import parse_message
+
 
 task_bp = Blueprint("tasks", __name__)
 
@@ -37,6 +38,8 @@ def chat():
 
     parsed = parse_message(message)
     intent = parsed["intent"]
+    log_interaction(message, intent)
+    
 
     #  ADD TASK
     if intent == "add_task":

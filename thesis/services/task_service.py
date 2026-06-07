@@ -40,3 +40,10 @@ def delete_task(task_id: int) -> bool:
         )
         return cursor.rowcount > 0
     
+def log_interaction(user_input: str, detected_intent: str) -> None:
+    with get_connection() as conn:
+        conn.execute(
+            "INSERT INTO logs (user_input, detected_intent) VALUES (?, ?)",
+            (user_input, detected_intent)
+        )
+

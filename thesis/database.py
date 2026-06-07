@@ -23,8 +23,15 @@ def init_db():
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 title TEXT NOT NULL,
                 due_date TEXT,
-                status TEXT DEFAULT 'pending',
-                CHECK(status IN ('pending', 'completed'))
+                status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'completed'))
+            )
+        """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS logs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_input TEXT NOT NULL,
+                detected_intent TEXT NOT NULL,
+                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         """)
     print("Database initialized successfully!")
